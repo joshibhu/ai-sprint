@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     openai_api_key: str                 # no default => required
     openai_model: str = "gpt-5.4-mini"  # override with OPENAI_MODEL
 
+    # USD per 1,000,000 tokens — verify against
+    # https://platform.openai.com/docs/pricing for your model.
+    usd_per_1m_input: float = 0.05
+    usd_per_1m_output: float = 0.40
+
+    usd_to_inr: float = 100.0
 
 # Runs once at import — Python's singleton bean. Missing key fails at startup.
 settings = Settings()
