@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "openai>=3.14.1",
     "pydantic-settings>=2.15.0",
+    "pypdf>=6.19.0",
 ]
 
 [project.scripts]
@@ -15,3 +16,8 @@ sprint = "sprint.__main__:main"
 [build-system]
 requires = ["uv_build>=0.10.7,<0.11.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "reportlab>=5.0.1",
+]

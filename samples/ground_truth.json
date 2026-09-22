@@ -1,0 +1,72 @@
+{
+  "01_clean.pdf": {
+    "invoice_number": "INV-2026-001",
+    "invoice_date": "15/01/2026",
+    "vendor_name": "Bharat Electronics Ltd",
+    "total_amount": 12500.0,
+    "_trap": "none \u2014 baseline"
+  },
+  "02_number_in_footer.pdf": {
+    "invoice_number": "BE/2026/0847",
+    "invoice_date": "22/01/2026",
+    "vendor_name": "Sunrise Traders",
+    "total_amount": 8750.5,
+    "_trap": "invoice number is in the footer, not the header"
+  },
+  "03_bill_to_trap.pdf": {
+    "invoice_number": "INV-3391",
+    "invoice_date": "05/02/2026",
+    "vendor_name": "Kaveri Industrial Supplies",
+    "total_amount": 45200.0,
+    "_trap": "customer name is far more prominent than the vendor name"
+  },
+  "04_ambiguous_date.pdf": {
+    "invoice_number": "TX-2026-0119",
+    "invoice_date": "03/04/2026",
+    "vendor_name": "Deccan Logistics",
+    "total_amount": 3299.0,
+    "_trap": "date 03/04/2026 \u2014 is it 3 April or 4 March?"
+  },
+  "05_amount_due_label.pdf": {
+    "invoice_number": "AC-88213",
+    "invoice_date": "11/02/2026",
+    "vendor_name": "Metro Office Solutions",
+    "total_amount": 15750.0,
+    "_trap": "labelled 'Amount Due', never 'Total'"
+  },
+  "06_many_totals.pdf": {
+    "invoice_number": "SI-2026-447",
+    "invoice_date": "28/02/2026",
+    "vendor_name": "Nandi Steel Works",
+    "total_amount": 67890.25,
+    "_trap": "Subtotal / Tax / Previous Balance / Total Due \u2014 three decoys"
+  },
+  "07_indian_format.pdf": {
+    "invoice_number": "GT-9920",
+    "invoice_date": "07/03/2026",
+    "vendor_name": "Anand Textiles Pvt Ltd",
+    "total_amount": 123456.78,
+    "_trap": "Rs. 1,23,456.78 \u2014 Indian digit grouping, not Western"
+  },
+  "08_two_column.pdf": {
+    "invoice_number": "QP-2026-31",
+    "invoice_date": "12/03/2026",
+    "vendor_name": "Zenith Components",
+    "total_amount": 9999.0,
+    "_trap": "two-column layout \u2014 tests whether text extraction scrambles order"
+  },
+  "09_utility_bill.pdf": {
+    "invoice_number": "KPDC-4471892",
+    "invoice_date": "01/03/2026",
+    "vendor_name": "Konkan Power Distribution Co",
+    "total_amount": 4832.0,
+    "_trap": "utility bill layout \u2014 no line items, different vocabulary"
+  },
+  "10_credit_note.pdf": {
+    "invoice_number": "CN-2026-014",
+    "invoice_date": "18/03/2026",
+    "vendor_name": "Sunrise Traders",
+    "total_amount": -2150.0,
+    "_trap": "credit note \u2014 the total is NEGATIVE"
+  }
+}
