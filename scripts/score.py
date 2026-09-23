@@ -11,8 +11,8 @@ import re
 import sys
 from pathlib import Path
 
-from sprint.extract import ExtractionError, extract_from_pdf
-from sprint.pdf import EmptyPdfError
+from sprint.extraction import ExtractionError, extract_from_pdf
+from sprint.extraction import EmptyPdfError
 
 SAMPLES = Path(__file__).resolve().parent.parent / "samples"
 FIELDS = ["invoice_number", "invoice_date", "vendor_name", "total_amount"]

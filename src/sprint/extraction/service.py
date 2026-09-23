@@ -5,10 +5,10 @@ from pathlib import Path
 
 from openai import APIError
 
-from .llm import client            # reuse the one client from Day 1
+from ..llm import client            # reuse the one client from Day 1
 from .pdf import read_text
 from .schema import Invoice
-from .settings import settings
+from ..settings import settings
 
 log = logging.getLogger(__name__)
 
