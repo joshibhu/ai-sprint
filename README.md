@@ -164,4 +164,85 @@ through its `__init__.py`. Four days in, one file still imports the vendor SDK.
 
 ---
 
-*Days 5–30 to follow.*
+## Day 5 — Tool calling, and what an "agent" actually is
+
+**Built:** an agent that answers questions by calling real functions — a live
+weather lookup and a calculator — written by hand, no framework.
+
+**Core concepts**
+
+- **The model cannot do anything.** No internet, no files, no clock. Asked for
+  the current temperature it says so, or invents one. It knows language, not today.
+- Tool calling is an arrangement: I send the question **plus a menu** of things
+  I am willing to do. The model replies with a *request* — a tool name and
+  arguments. **It never executes anything.** My code runs the function and sends
+  the result back as a new message. The model then answers.
+- Three separate things, linked only by a name:
+  - the function — my ordinary Python, never sent anywhere
+  - the menu — plain data describing it, sent to the model
+  - the dispatcher — a dictionary of what my code will *actually* run
+- **The dispatcher is the security boundary.** Not the prompt. If the model asks
+  for something not in that dictionary, the lookup fails and nothing happens.
+  "Safety" means the dangerous thing is not on the menu — the model's good
+  behaviour is irrelevant.
+- **An agent is a loop**, not a personality: ask → wants a tool? → run it →
+  feed the result back → ask again. It ends when the model replies with text
+  instead of a request. Cap the rounds: a confused model loops forever and
+  every lap is billed.
+- Two shapes of tool use, and only one needs the loop:
+  - *parallel* — "warmer in Pune or Bengaluru?" → both calls in one round
+  - *sequential* — "temperature in Pune, doubled?" → round 2's arguments come
+    from round 1's result. Impossible without looping.
+- **Never `eval()` a string from the model.** It is untrusted input, and `eval`
+  on it is arbitrary code execution. The calculator parses to a syntax tree and
+  walks an **allow-list** of node types — a block-list is only a list of attacks
+  you happened to think of.
+
+**What bit me**
+
+*The model skipped a tool it should have used, twice.* First it did arithmetic
+in its head. Then, asked to compare two hill stations for coolness, it gave a
+long travel answer with no live data at all — and ended by *offering* to fetch
+the weather. It had considered the tool and declined.
+
+Tool descriptions are prompt text, exactly like the Day 3 field descriptions.
+Adding "use this for comparisons between places" and "ALWAYS use this for
+arithmetic, your own is unreliable" made both tools fire.
+
+But the way I found that out is the real lesson. I changed **two** things at
+once — the description *and* a new system prompt — and it worked, so I could
+not tell which one mattered. Testing each alone, one run each, said *neither
+works alone, you need both*. **Running each five times said the opposite:**
+
+    neither (original)      0/5
+    new description only    5/5     <- this was the fix
+    system prompt only      2/5     <- flaky, and it made answers worse
+    both                    5/5
+
+The single run did not just miss a failure — it produced the **opposite
+conclusion**. I would have kept a change that does nothing.
+
+So the system prompt came out again. Removing a change after measuring it is
+harder than adding one; it feels like losing ground. I left a comment in the
+code saying why, so I do not helpfully re-add it in six months.
+
+**The wider lesson:** I optimised for "does it call the tool" because that is
+countable. What I actually wanted was a useful answer — and the blunt system
+prompt got the tool called while stripping out the travel advice that made the
+first answer good. The thing you can measure is rarely the thing you want.
+
+Underneath it all was a tool-design problem, not a prompting one: my tool
+returns **weather**, the question needed **climate**. No wording fixes a tool
+that returns the wrong kind of fact.
+
+**Run**
+
+```bash
+uv run python scripts/stage1.py   # the model asks; nothing answers
+uv run python scripts/stage2.py   # we answer; it finishes (has a known flaw — see the file)
+uv run python scripts/stage3.py   # the loop
+```
+
+---
+
+*Days 6–30 to follow.*
