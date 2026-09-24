@@ -120,14 +120,18 @@ CALCULATE_TOOL = {
 }
 
 
+from .stations import STATION_MENU, STATION_TOOLS
+
+
 # What the code will ACTUALLY run. The model can name anything;
 # only what is in this dictionary can happen.
 TOOLS = {
     "get_weather": get_weather,
     "calculate": calculate,
+    **STATION_TOOLS,
 }
 
-MENU = [WEATHER_TOOL, CALCULATE_TOOL]
+MENU = [WEATHER_TOOL, CALCULATE_TOOL, *STATION_MENU]
 
 
 def dispatch(name: str, args: dict) -> str:

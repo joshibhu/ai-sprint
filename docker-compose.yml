@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:17
+    container_name: sprint-db
+    environment:
+      POSTGRES_DB: sprint
+      POSTGRES_USER: sprint_owner
+      # Dev only. This database listens on localhost and holds public data.
+      # The credential that matters is the read-only one the app uses — that
+      # one lives in .env. Knowing which secrets are real is half the skill.
+      POSTGRES_PASSWORD: dev_only_not_a_secret
+    ports:
+      - "5433:5432"          # host 5433 -> container 5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sprint_owner -d sprint"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:

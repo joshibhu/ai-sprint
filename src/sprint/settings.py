@@ -22,5 +22,8 @@ class Settings(BaseSettings):
 
     usd_to_inr: float = 100.0
 
+    # Read-only Postgres login. NEVER the owner role.
+    database_url: str = "postgresql://sprint_app:app_dev_password@localhost:5433/sprint"
+
 # Runs once at import — Python's singleton bean. Missing key fails at startup.
 settings = Settings()
