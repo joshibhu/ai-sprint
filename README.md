@@ -331,4 +331,74 @@ uv run python scripts/attack.py                       # try to destroy the data
 
 ---
 
-*Days 7–30 to follow.*
+## Day 7 — Testing something that answers differently every time
+
+**Built:** 21 tests. 11 run with no network, no database and no cost, in a
+fifth of a second. The other 10 need Postgres and are marked `integration`.
+
+**Core concepts**
+
+- **You cannot unit-test a model.** It costs money, needs a network, and gives
+  a different answer each run — 10/10 then 9/10 on Day 3, 0/5 then 5/5 on Day 5.
+  So do not test it. **Replace it**, and test my own code: the dispatcher, the
+  SQL, the loop's exit conditions, the message shapes. Those are deterministic,
+  and that is where my bugs actually live.
+- The fake replays a **scripted list of turns** and records every request, so
+  tests can assert on what was *sent*, not only what came back. That is how
+  `test_tool_result_is_fed_back_and_used` pins the exact 400 I hit on Day 6:
+  the message order must be system, user, assistant, tool — with matching
+  `tool_call_id`.
+- **Fake the model; do NOT fake the database.** The asymmetry is the point.
+  The model is not what I am testing. The SQL *is* — the filters, the NULLs,
+  the GROUP BY. A fake database would only prove the fake works.
+- `test_menu_and_dispatcher_agree` is the cheapest safety net in the repo: a
+  tool registered but not offered (a capability nobody reviewed), or offered
+  but not registered (the model asks and gets an error). One assertion.
+- Integration tests are **skipped, not failed**, when Docker is down —
+  `pytest -m "not integration"` is the fast loop.
+
+**Tests and evals are different things, and conflating them wastes weeks**
+
+|          | Tests                    | Evals                            |
+|----------|--------------------------|----------------------------------|
+| Subject  | my code                  | the model's behaviour            |
+| Result   | pass / fail              | a rate, over many runs           |
+| Speed    | milliseconds, free       | minutes, costs money             |
+| When     | every commit             | when something changes           |
+
+No test asserts the model picks the right tool — that is a rate, measured by
+scripts like `measure_refusal.py`, not an assertion. Day 19 builds this properly.
+
+**What bit me**
+
+A test failed and **the code was right**. `test_city_lookup_is_case_insensitive`
+compared the whole output for "pune" and "PUNE" — but the header echoes the
+caller's spelling back, so the strings differ while the seven station rows are
+identical. Over-specified assertion: it asserted more than the behaviour I
+cared about. Fixed by comparing the rows.
+
+*Also, from earlier the same day:* a measurement script scored "honest refusal
+0/3" everywhere, which looked like a finding. It was a bug — models write a
+curly apostrophe (U+2019), my match list used a straight one, so `"can't"`
+never matched `"can’t"`. **A broken detector does not raise an error; it
+returns a plausible number.** The tell was that the sample answers contradicted
+the scores, which is why the script prints samples alongside the count.
+
+*And the conclusion I had to accept:* the system-prompt clause I added to make
+the agent refuse honestly is **unverified**. Reading the samples, the old
+prompt was already refusing sensibly. That is twice a system prompt has
+measured weaker than it felt. The order of leverage is: a tool that exists >
+its description > the system prompt. When the agent cannot answer, ask which
+of those three is missing — it is almost never the third.
+
+**Run**
+
+```bash
+uv run pytest                        # all 21
+uv run pytest -m "not integration"   # 11, no Docker needed
+uv run pytest -v                     # see the names
+```
+
+---
+
+*Days 8–30 to follow.*

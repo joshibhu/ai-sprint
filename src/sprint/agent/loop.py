@@ -12,7 +12,17 @@ MAX_ROUNDS = 5     # a confused model loops forever, and you pay per lap
 # prompt was removed. Measured over 5 runs it only nudged tool use 2/5,
 # while the tool DESCRIPTION alone achieved 5/5 — and the blunt instruction
 # made answers worse, stripping useful general knowledge out of them.
-SYSTEM = "You are a helpful assistant. Be concise."
+# The clause below is NOT that instruction returning. That one pushed tool
+# use everywhere. This one is scoped to station data and does not add
+# capability — it converts a vague non-answer into a clear refusal, which is
+# the difference between a user knowing the system failed and not knowing.
+SYSTEM = (
+    "You are a helpful assistant. Be concise.\n"
+    "Facts about charging stations come ONLY from the tools provided. If no "
+    "tool can answer a question about stations, say so plainly and name what "
+    "you can answer instead. Never answer a station question from your own "
+    "knowledge, and never guess."
+)
 
 
 def run_agent(question: str) -> str:

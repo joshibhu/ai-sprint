@@ -24,5 +24,15 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "pytest>=9.1.1",
     "reportlab>=5.0.1",
+]
+
+[tool.pytest.ini_options]
+# `tests` on the path so conftest helpers import cleanly; `-q` for quiet output.
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["tests"]
+markers = [
+    "integration: needs a running database (docker compose up -d)",
 ]
